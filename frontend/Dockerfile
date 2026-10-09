@@ -8,4 +8,4 @@ RUN sed -i "s/__BUILD__/${BUILD_NUMBER}/g" *.html
 FROM nginxinc/nginx-unprivileged:1.27-alpine
 COPY --from=build /site /usr/share/nginx/html
 EXPOSE 8080
-HEALTHCHECK --interval=15s --timeout=3s CMD wget -qO- http://localhost:8080/ >/dev/null || exit 1
+HEALTHCHECK --interval=15s --timeout=3s CMD wget -qO- http://127.0.0.1:8080/ >/dev/null || exit 1
