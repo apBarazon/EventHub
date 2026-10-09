@@ -1,13 +1,18 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'ROLLBACK_TAG', defaultValue: '',
+               description: 'Leave empty for a normal build. Enter a previous build number (e.g. 2) to redeploy that version without rebuilding.')
+    }
+
     environment {
         COMPOSE_PROJECT_NAME = 'eventhub'
-        TAG = "${env.BUILD_NUMBER}"          // images tagged by build number -> rollback
+        TAG = "${params.ROLLBACK_TAG ?: env.BUILD_NUMBER}"   // rollback tag if given, else this build's number
     }
 
     triggers {
-        pollSCM('H/2 * * * *')               // Poll SCM every ~2 minutes (switch to githubPush() when a webhook is available)
+        pollSCM('H/2 * * * *')
     }
 
     options {
@@ -21,14 +26,15 @@ pipeline {
         }
 
         stage('Test') {
+            when { expression { !params.ROLLBACK_TAG } }
             steps {
-                // Runs each module's Dockerfile "test" stage (node:test). A failing test fails the build here.
                 sh 'docker build --target test -t eventhub/catalog-api:test ./catalog-api'
                 sh 'docker build --target test -t eventhub/report-service:test ./report-service'
             }
         }
 
         stage('Build Images') {
+            when { expression { !params.ROLLBACK_TAG } }
             steps {
                 withCredentials([file(credentialsId: 'eventhub-env', variable: 'ENV_FILE')]) {
                     sh 'cp "$ENV_FILE" .env'
@@ -39,7 +45,10 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker compose up -d --no-build --remove-orphans'
+                withCredentials([file(credentialsId: 'eventhub-env', variable: 'ENV_FILE')]) {
+                    sh 'cp "$ENV_FILE" .env'
+                    sh 'docker compose up -d --no-build --remove-orphans'
+                }
             }
         }
 
@@ -49,8 +58,8 @@ pipeline {
     }
 
     post {
-        success { echo "EventHub build ${TAG} is live at http://localhost:8090" }
-        failure { echo "Build ${TAG} failed. Roll back with: TAG=<previous> docker compose -p eventhub up -d --no-build" }
+        success { echo "EventHub version ${TAG} is live at http://localhost:8090" }
+        failure { echo "Deploy of version ${TAG} failed. Re-run with Build with Parameters and set ROLLBACK_TAG to a previous good build number." }
         always  { sh 'rm -f .env' }
     }
 }
