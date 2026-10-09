@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>EventHub Admin</title>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'light'}catch(e){}</script>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="nav"><span class="brand">&#127903; EventHub Admin</span>
+    <nav><a href="#" data-tab="dashboard">Dashboard</a><a href="#" data-tab="events">Events</a><a href="#" data-tab="registrations">Registrations</a>
+      <a href="#" data-tab="notifications">Notifications <span id="nbadge"></span></a>
+      <button id="theme">&#127769;</button><button id="logout">Logout</button></nav></header>
+  <main id="view">Loading...</main>
+  <div id="modal-root"></div>
+  <footer>EventHub Admin &middot; Build <span>__BUILD__</span></footer>
+  <script src="admin.js"></script>
+</body>
+</html>

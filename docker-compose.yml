@@ -1,0 +1,88 @@
+services:
+  proxy:
+    build: ./proxy
+    image: eventhub/proxy:${TAG:-latest}
+    ports:
+      - "8090:80"            # only published port: the single public entry point
+    depends_on: [frontend, admin-panel, catalog-api, report-service]
+    restart: unless-stopped
+    networks: [eventhub-net]
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        BUILD_NUMBER: ${TAG:-dev}
+    image: eventhub/frontend:${TAG:-latest}
+    restart: unless-stopped
+    networks: [eventhub-net]
+
+  admin-panel:
+    build:
+      context: ./admin-panel
+      args:
+        BUILD_NUMBER: ${TAG:-dev}
+    image: eventhub/admin-panel:${TAG:-latest}
+    restart: unless-stopped
+    networks: [eventhub-net]
+
+  catalog-api:
+    build:
+      context: ./catalog-api
+      target: production
+    image: eventhub/catalog-api:${TAG:-latest}
+    environment:
+      DB_HOST: db
+      DB_NAME: eventhub
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [eventhub-net]
+
+  report-service:
+    build:
+      context: ./report-service
+      target: production
+    image: eventhub/report-service:${TAG:-latest}
+    environment:
+      DB_HOST: db
+      DB_NAME: eventhub
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [eventhub-net]
+
+  db:
+    build: ./db
+    image: eventhub/db:${TAG:-latest}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: eventhub
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    networks: [eventhub-net]      # no ports published
+
+volumes:
+  db-data:
+
+networks:
+  eventhub-net:

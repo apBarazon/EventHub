@@ -1,0 +1,7 @@
+{
+  "name": "catalog-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "start": "node src/server.js", "test": "node --test" },
+  "dependencies": { "mysql2": "3.11.3" }
+}
