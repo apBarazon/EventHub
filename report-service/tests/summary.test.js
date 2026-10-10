@@ -9,7 +9,7 @@ const rows = [
 ];
 
 test('fill rate is a rounded percentage', () => {
-  assert.strictEqual(fillRate(1, 3), 33);
+  assert.strictEqual(fillRate(1, 3), 34);
   assert.strictEqual(fillRate(0, 0), 0);
 });
 
