@@ -87,7 +87,7 @@
 
   function openRegister(ev) {
     if (!state.user) {
-      openModal(`<h3>Create an account first</h3><p>Please log in or sign up to register for <b>${esc(ev.title)}</b>.</p>
+      openModal(`<h3>Create an account first</h3><p>Please Log in or Sign up to register for <b>${esc(ev.title)}</b>.</p>
         <div class="row"><button id="cancel">Cancel</button><button class="primary" id="goLogin">Login</button><button class="primary" id="goSignup">Sign Up</button></div>`);
       $('#cancel').onclick = closeModal;
       $('#goLogin').onclick = () => { closeModal(); location.hash = '#/login'; };
