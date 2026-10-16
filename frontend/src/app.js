@@ -71,7 +71,7 @@
   // ---------- views ----------
   async function homeView() {
     if (isAdmin()) { location.href = '/admin/'; return; }
-    $('#view').innerHTML = '<h2>Upcoming School Events</h2><div class="grid" id="grid">Loading...</div>';
+    $('#view').innerHTML = '<h2>Upcoming School Events - Register Now!</h2><div class="grid" id="grid">Loading...</div>';
     try {
       const events = await api('/events');
       $('#grid').innerHTML = events.map((e) => {
