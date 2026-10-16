@@ -22,12 +22,33 @@ Students browse school events (conferences, seminars, workshops), register throu
 | http://localhost:8090/admin/ | Admin panel |
 | http://localhost:8080 | Jenkins |
 
+## Prerequisites
+
+Install these before running anything below:
+- **Git** — to clone this repository
+- **Docker Desktop** (Windows/Mac, with WSL2 enabled on Windows) or Docker Engine (Linux) — this is what runs every command in this README. Confirm it's installed and running with:
+  ```bash
+  docker --version
+  docker compose version
+  ```
+- A terminal — the VS Code integrated terminal (`` Ctrl+` ``) works fine
+
+No other installs are needed. Node.js, MySQL, and nginx all run inside containers — you do not install them on your own machine.
+
 ## Run locally
-```bash
-cp .env.example .env      # edit the passwords
-docker compose up -d --build
-```
-Open http://localhost:8090. The admin account is created on first start from `ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`.
+
+1. Clone the repo and open its folder in VS Code (or `cd` into it in a terminal). Confirm you're in the right place — `ls` should show `docker-compose.yml`, `Dockerfile`-free root, `frontend/`, `catalog-api/`, `db/`, etc.
+2. Create your local environment file and fill in real values (replace every `change-me` placeholder):
+   ```bash
+   cp .env.example .env
+   ```
+3. Build and start every container with one command:
+   ```bash
+   docker compose up -d --build
+   ```
+   First run takes a minute or two (downloading base images). Check everything started with `docker compose ps` — all services should show "Up" and `db` should show "healthy".
+4. Open **http://localhost:8090** in your browser. The admin account is created on first start from `ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`.
+
 Note: a manual build shows `Build dev` in the footer. Builds made by Jenkins show the real build number.
 
 ## Jenkins setup
@@ -55,8 +76,9 @@ TAG=<previous build number> docker compose up -d --no-build
 
 ## Team
 | Member | Role |
+|---|---|
 | Barazon, Angelo P. | Project Lead / Scrum Master |
-| Laxamana, Karl Kristian Kenneth N.  | DevOps / CI-CD |
-| Villanueva, Martin M.  | Infrastructure |
+| Laxamana, Karl Kristian Kenneth N. | DevOps / CI-CD |
+| Villanueva, Martin M. | Infrastructure |
 | Barazon, Angelo P. | Backend and Database |
-| Tanglao, Joshua Lawrance S.  | Frontend, QA and Documentation |
+| Tanglao, Joshua Lawrance S. | Frontend, QA and Documentation |
